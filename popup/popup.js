@@ -1,10 +1,11 @@
 /**
- * Maps & Search Lead Generator — Master Lead Suite (v7.2 PRO for Edge & Chrome)
+ * Maps & Search Lead Generator — Master Lead Suite (v7.3 PRO for Edge & Chrome)
  *
  * Developed by JSP Coders
- * Multi-Platform Extraction: Google Maps + Google Search
- * Multi-Token Title Matching: 100% reliable place navigation without skipping valid places.
- * Extended Phone Extraction: 5-layer DOM & Regex detection for maximum phone capture.
+ * Fine-Tuned Regex Engine:
+ * 1. Strict single-line Phone Regex: Prevents matching across newlines (\n).
+ * 2. Optimized Indian & International Phone Number Extraction.
+ * 3. Clean Regex character sets [0-9 \-.()] to eliminate unneeded escapes.
  */
 
 let allLeads = [];
@@ -56,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     phoneCount.textContent = allLeads.filter(l => l.Phone && l.Phone.length > 3).length;
     hotCount.textContent = allLeads.filter(l => l["Sales Angle"] && l["Sales Angle"].includes('Hot')).length;
     
-    // GUARANTEED EXPORT: Enabled as long as total leads exist!
     const hasLeads = allLeads.length > 0;
     exportXlsxBtn.disabled = !hasLeads;
     exportCsvBtn.disabled  = !hasLeads;
@@ -481,8 +481,9 @@ function scrapeGoogleSearchPage() {
       const text = snippetEl ? snippetEl.innerText : block.innerText;
 
       let phone = '';
-      const phoneMatch = text.match(/(\+?\d[\d\s\-().]{8,}\d)/);
-      if (phoneMatch) phone = phoneMatch[1].trim();
+      // Strict single-line phone regex (does not cross newlines)
+      const phoneMatch = text.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/);
+      if (phoneMatch && phoneMatch[0].length >= 8) phone = phoneMatch[0].trim();
 
       let email = '';
       const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
@@ -669,15 +670,16 @@ function scrapeVisibleListings() {
         if (line !== name && !line.match(/^\d/) && !line.match(/^\(/) &&
             !line.includes('·') && line.length < 35 && line.length > 2 &&
             !line.match(/Open|Closed|hour/i) && !line.match(/^\$/) &&
-            !line.match(/^\+?\d[\d\s()-]{6,}/)) {
+            !line.match(/^\+?\d[0-9 \-.()]{6,}/)) {
           category = line;
           break;
         }
       }
 
       let phone = '';
-      const phoneMatch = cardText.match(/(\+?\d[\d\s\-().]{8,}\d)/);
-      if (phoneMatch) phone = phoneMatch[1].trim();
+      // Strict single-line phone match on card text
+      const phoneMatch = cardText.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/);
+      if (phoneMatch && phoneMatch[0].length >= 8) phone = phoneMatch[0].trim();
 
       const phoneBtn = card.querySelector('button[aria-label*="Call"]') || card.querySelector('a[href^="tel:"]');
       if (phoneBtn) {
@@ -800,7 +802,6 @@ async function enrichListings() {
       link.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
     });
 
-    // Flexible multi-token matching logic
     const cleanWords = str => str.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
     const targetTokens = cleanWords(targetName);
 
