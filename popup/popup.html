@@ -2,18 +2,39 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Lead Generator v7.1 — JSP Coders</title>
+  <title>Lead Generator v8.0 — JSP Coders</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h2>🗺️ Lead Machine</h2>
-      <span class="badge">v7.1 PRO</span>
+      <span class="badge">v8.0 PRO</span>
+      <button id="settingsBtn" class="icon-btn" title="Settings">⚙️</button>
     </div>
     <p class="subtitle">Multi-Platform Lead Generation Suite by <strong>JSP Coders</strong></p>
 
     <div class="alert" id="alertBox" style="display:none"></div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel" style="display:none">
+      <div class="settings-title">⚙️ Settings</div>
+      <label class="settings-label">Country code (prefixed to 10-digit numbers for WhatsApp)
+        <input type="text" id="countryCodeInput" maxlength="4" placeholder="91">
+      </label>
+      <label class="settings-label">WhatsApp message template ({name} = business name)
+        <textarea id="waTemplateInput" rows="3"></textarea>
+      </label>
+      <div class="settings-row">
+        <label class="settings-label">Scroll rounds
+          <input type="number" id="scrollRoundsInput" min="1" max="40">
+        </label>
+        <label class="settings-label">Enrich limit
+          <input type="number" id="enrichCapInput" min="1" max="500">
+        </label>
+      </div>
+      <button id="saveSettingsBtn" class="btn btn-primary btn-sm">💾 Save Settings</button>
+    </div>
 
     <!-- Quick Search & Filter Controls -->
     <div class="filter-bar">
@@ -32,9 +53,19 @@
     <!-- Main Action Buttons -->
     <div class="controls">
       <button id="scrapeBtn" class="btn btn-primary">⚡ Scrape This Page</button>
-      <button id="scrollBtn" class="btn btn-secondary">📜 Scroll & Load More</button>
-      <button id="enrichBtn" class="btn btn-warning" disabled>📞 Fetch Phone & Details</button>
-      
+      <div class="export-group">
+        <button id="scrollBtn" class="btn btn-secondary">📜 Scroll &amp; Load More</button>
+        <button id="autoBtn" class="btn btn-secondary">🤖 Auto-Collect All</button>
+      </div>
+      <button id="enrichBtn" class="btn btn-warning" disabled>📞 Fetch Phone &amp; Details</button>
+      <button id="cancelBtn" class="btn btn-danger" style="display:none">✋ Cancel</button>
+
+      <!-- Progress Bar -->
+      <div class="progress-wrap" id="progressWrap" style="display:none">
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        <span class="progress-label" id="progressLabel"></span>
+      </div>
+
       <div class="export-group">
         <button id="exportXlsxBtn" class="btn btn-success" disabled>📥 Export Excel (.xlsx)</button>
         <button id="exportCsvBtn" class="btn btn-secondary" disabled>📄 Export CSV</button>
@@ -65,6 +96,9 @@
         Open Google Maps or Search, then click "Scrape This Page"
       </div>
     </div>
+
+    <!-- Lead List -->
+    <div class="lead-list" id="leadList"></div>
 
     <div class="developer-footer">
       Engineered with ❤️ by <span class="dev-name">JSP Coders</span>

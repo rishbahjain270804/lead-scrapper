@@ -1,4 +1,4 @@
-# 🗺️ Maps & Search Lead Machine PRO (v7.2 PRO)
+# 🗺️ Maps & Search Lead Machine PRO (v8.0 PRO)
 
 Developed with ❤️ by **JSP Coders**
 
@@ -9,13 +9,19 @@ A powerful Chrome & Microsoft Edge extension (Manifest V3) to extract high-ticke
 ## 🔥 Features
 
 - ⚡ **Dual Engine Lead Extraction**: Scrapes business leads from both Google Maps and Google Search results.
-- 💬 **WhatsApp 1-Click Outreach Links**: Automatically generates formatted WhatsApp links (`https://wa.me/91XXXXXXXXXX`) for instant messaging.
+- 💾 **Persistent Lead Storage**: Leads are saved automatically (`chrome.storage.local`) — closing the popup or browser no longer loses your data.
+- 📋 **Live Lead List**: Review, filter, open-in-Maps, WhatsApp, or delete individual leads right inside the popup.
+- 🤖 **Auto-Collect All**: One click scrolls the Maps results to the end and scrapes everything.
+- 💬 **WhatsApp 1-Click Outreach Links**: Automatically generates formatted WhatsApp links (`https://wa.me/...`) with a configurable country code and message template.
 - 🎯 **AI Sales Opportunity Rating**: Categorizes leads into high-ticket sales opportunities:
-  - `🔥 Hot Web Design Deal ($1,000+ Deal)`: 30+ Reviews & 4.5+ Rating BUT No Website.
-  - `🔥 Hot Lead`: Missing Website (Ideal web development prospect).
+  - `🔥 Hot Web Design Deal ($1,000+ Deal)`: 30+ Reviews BUT confirmed No Website.
+  - `🔥 Hot Lead`: Confirmed missing website (Ideal web development prospect).
   - `⭐ Review Pitch`: Rating < 4.2 (Ideal reputation management prospect).
-- 📇 **vCard / Phone Contacts (.vcf) Export**: Export phone numbers directly into phone contacts or WhatsApp Business.
-- 📊 **SheetJS Excel (.xlsx) & CSV Export**: Custom formatted columns organized by sales priority.
+- 📞 **Reliable Detail Enrichment**: Per-listing navigation with place-ID verification, live progress bar, cancel button, and incremental saving — no more mis-attributed phone numbers.
+- 📧 **Email Capture**: Dedicated Email column populated from Google Search snippets.
+- 📇 **vCard / Phone Contacts (.vcf) Export**: RFC-escaped vCards for phone contacts or WhatsApp Business.
+- 📊 **SheetJS Excel (.xlsx) & CSV Export**: Columns ordered by sales priority; CSV includes a UTF-8 BOM so Excel renders emoji correctly.
+- ⚙️ **Settings Panel**: Country code, WhatsApp message template, scroll rounds, and enrichment limit.
 - 🔍 **Live Search & Filter Bar**: Filter leads in real-time by *All*, *Hot Deals*, *Phone Only*, or *No Website*.
 - 🌐 **Cross-Browser Compatibility**: Runs natively on **Google Chrome** & **Microsoft Edge**.
 

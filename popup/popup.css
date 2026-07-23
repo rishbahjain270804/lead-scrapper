@@ -23,7 +23,7 @@ body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  width: 360px;
+  width: 400px;
   background-image: radial-gradient(ellipse at top right, rgba(99,102,241,0.15), transparent 300px);
 }
 .container { padding: 14px; }
@@ -115,6 +115,146 @@ h2 { font-size: 17px; font-weight: 700; background: linear-gradient(135deg,#c7d2
 .stat-label { display: block; font-size: 8.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .stat-value { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; }
 .status-text { font-size: 10.5px; color: var(--text-dim); text-align: center; line-height: 1.4; }
+
+/* Header icon button */
+.icon-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 13px;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:hover, .icon-btn.active { border-color: var(--primary); color: var(--text); }
+
+/* Settings Panel */
+.settings-panel {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-title { font-size: 12px; font-weight: 700; color: var(--text); }
+.settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+  flex: 1;
+}
+.settings-panel input, .settings-panel textarea {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 11px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+.settings-panel input:focus, .settings-panel textarea:focus { border-color: var(--primary); }
+.settings-row { display: flex; gap: 8px; }
+.btn-sm { padding: 7px 10px; font-size: 11px; }
+.btn-danger { background: var(--danger); }
+.btn-danger:not(:disabled):hover { background: #dc2626; }
+
+/* Progress Bar */
+.progress-wrap { display: flex; flex-direction: column; gap: 3px; }
+.progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), #818cf8);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.progress-label { font-size: 10px; color: var(--text-dim); text-align: center; }
+
+/* Lead List */
+.lead-list {
+  margin-top: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lead-list::-webkit-scrollbar { width: 5px; }
+.lead-list::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 3px; }
+.lead-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.lead-info { flex: 1; min-width: 0; }
+.lead-name {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lead-name:hover { color: #a5b4fc; text-decoration: underline; }
+.lead-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lead-badge { font-size: 13px; cursor: default; flex-shrink: 0; }
+.lead-wa {
+  font-size: 13px;
+  text-decoration: none;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.lead-wa:hover { opacity: 1; }
+.lead-del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 3px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.lead-del:hover { color: var(--danger); }
+.lead-list-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 4px;
+}
+.lead-empty {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 10px;
+}
 
 .developer-footer {
   margin-top: 10px;
