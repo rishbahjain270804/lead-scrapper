@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lead Generator v7.1 — JSP Coders</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>🗺️ Lead Machine</h2>
+      <span class="badge">v7.1 PRO</span>
+    </div>
+    <p class="subtitle">Multi-Platform Lead Generation Suite by <strong>JSP Coders</strong></p>
+
+    <div class="alert" id="alertBox" style="display:none"></div>
+
+    <!-- Quick Search & Filter Controls -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search leads by name, city..." />
+        <button id="clearSearchBtn" class="clear-search-btn" title="Clear Search">&times;</button>
+      </div>
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip chip-hot" data-filter="hot">🔥 Hot Deals</button>
+        <button class="chip chip-phone" data-filter="phone">📞 Phone</button>
+        <button class="chip chip-noweb" data-filter="noweb">🌐 No Web</button>
+      </div>
+    </div>
+
+    <!-- Main Action Buttons -->
+    <div class="controls">
+      <button id="scrapeBtn" class="btn btn-primary">⚡ Scrape This Page</button>
+      <button id="scrollBtn" class="btn btn-secondary">📜 Scroll & Load More</button>
+      <button id="enrichBtn" class="btn btn-warning" disabled>📞 Fetch Phone & Details</button>
+      
+      <div class="export-group">
+        <button id="exportXlsxBtn" class="btn btn-success" disabled>📥 Export Excel (.xlsx)</button>
+        <button id="exportCsvBtn" class="btn btn-secondary" disabled>📄 Export CSV</button>
+      </div>
+      <div class="export-group">
+        <button id="exportVcfBtn" class="btn btn-info" disabled>📇 Export Phone Contacts (.vcf)</button>
+        <button id="clearBtn" class="btn btn-ghost">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <!-- Live Analytics & Status Panel -->
+    <div class="status-panel">
+      <div class="stats-row">
+        <div class="stat-box">
+          <span class="stat-label">Total Leads</span>
+          <span id="leadCount" class="stat-value">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">With Phone</span>
+          <span id="phoneCount" class="stat-value">0</span>
+        </div>
+        <div class="stat-box stat-box-hot">
+          <span class="stat-label">🔥 Hot Deals</span>
+          <span id="hotCount" class="stat-value">0</span>
+        </div>
+      </div>
+      <div id="statusText" class="status-text">
+        Open Google Maps or Search, then click "Scrape This Page"
+      </div>
+    </div>
+
+    <div class="developer-footer">
+      Engineered with ❤️ by <span class="dev-name">JSP Coders</span>
+    </div>
+  </div>
+  <script src="xlsx.full.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
