@@ -843,6 +843,7 @@ function scrapeGoogleSearchPage() {
 
   const results = [];
   const searchBlocks = document.querySelectorAll('div.g, div.MjjYud');
+  console.log('[LeadMachine] Search scrape: found', searchBlocks.length, 'result blocks');
 
   searchBlocks.forEach(block => {
     try {
@@ -855,11 +856,23 @@ function scrapeGoogleSearchPage() {
       const snippetEl = block.querySelector('div.VwiC3b, div.IsZvec');
       const text = snippetEl ? snippetEl.innerText : block.innerText;
 
+      console.groupCollapsed('[LeadMachine] search block:', name);
+      console.log('snippet text:', JSON.stringify(text));
+
+      // Try EVERY candidate, not just the first match — the first digit run in
+      // a snippet is often a date/price, with the real phone further along.
       let phone = '';
-      const phoneMatch = text.match(/(\+?\d[\d\s\-().]{6,18}\d)/);
-      if (phoneMatch && countDigits(phoneMatch[1]) >= 8 && countDigits(phoneMatch[1]) <= 15) {
-        phone = phoneMatch[1].trim();
+      const candidates = text.match(/\+?\d[\d\s\-().]{6,18}\d/g) || [];
+      for (const c of candidates) {
+        const d = countDigits(c);
+        if (!phone && d >= 8 && d <= 15) {
+          phone = c.trim();
+          console.log(`phone candidate ACCEPTED: "${c}" (${d} digits)`);
+        } else {
+          console.log(`phone candidate rejected: "${c}" (${d} digits${phone ? ', already have one' : ', need 8-15'})`);
+        }
       }
+      if (candidates.length === 0) console.log('phone: no candidates in snippet');
 
       let email = '';
       const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
@@ -868,6 +881,9 @@ function scrapeGoogleSearchPage() {
       const website = href && !href.includes('google.com') ? href : '';
       // A search hit link proves a web presence; its absence proves nothing.
       const hasOwnWebsite = website ? 'Yes' : 'Unknown';
+      console.log('website decision:', href ? `link "${href}" → ${website ? 'own website (Yes)' : 'google link, ignored (Unknown)'}` : 'no link (Unknown)');
+      console.log('final:', { phone, email, website });
+      console.groupEnd();
 
       results.push({
         "Business Name": name,
@@ -948,8 +964,15 @@ function scrapeVisibleListings() {
     if (!phone) {
       const panel = document.querySelector('div[role="main"]') || document.querySelector('.m6QErb');
       const mainText = panel ? panel.innerText : '';
-      const m = mainText.match(/\+?\d[\d\s\-().]{6,18}\d/);
-      if (m && isValidPhone(m[0])) phone = m[0].trim();
+      const candidates = mainText.match(/\+?\d[\d\s\-().]{6,18}\d/g) || [];
+      for (const c of candidates) {
+        if (isValidPhone(c)) {
+          phone = c.trim();
+          console.log(`[LeadMachine] panel-text phone fallback ACCEPTED: "${c}"`);
+          break;
+        }
+        console.log(`[LeadMachine] panel-text phone fallback rejected: "${c}" (need 8-15 digits)`);
+      }
     }
 
     let address = '';
@@ -1023,8 +1046,10 @@ function scrapeVisibleListings() {
 
   const results = [];
   const links = document.querySelectorAll('a.hfpxzc');
+  console.log('[LeadMachine] List scrape: found', links.length, 'listing links');
 
   if (links.length === 0) {
+    console.log('[LeadMachine] No list links — falling back to single-place detail panel');
     const singlePlace = extractCurrentDetailPanel();
     if (singlePlace) results.push(singlePlace);
     return results;
@@ -1041,6 +1066,9 @@ function scrapeVisibleListings() {
 
       const cardText = card.innerText || '';
       const lines = cardText.split('\n').map(l => l.trim()).filter(l => l);
+
+      console.groupCollapsed('[LeadMachine] card:', name);
+      console.log('raw card lines:', lines);
 
       let rating = '';
       const ratingMatch = cardText.match(/(\d\.\d)\s*\(/);
@@ -1061,18 +1089,36 @@ function scrapeVisibleListings() {
         }
       }
 
+      // Try EVERY candidate digit-run in the card text, not just the first —
+      // ratings/review counts/pincodes get rejected by the 8-15 digit rule
+      // and the real phone is often a later match.
       let phone = '';
-      const phoneMatch = cardText.match(/(\+?\d[\d\s\-().]{6,18}\d)/);
-      if (phoneMatch && countDigits(phoneMatch[1]) >= 8 && countDigits(phoneMatch[1]) <= 15) {
-        phone = phoneMatch[1].trim();
+      let phoneSource = '';
+      const candidates = cardText.match(/\+?\d[\d\s\-().]{6,18}\d/g) || [];
+      for (const c of candidates) {
+        const d = countDigits(c);
+        if (!phone && d >= 8 && d <= 15) {
+          phone = c.trim();
+          phoneSource = 'card text regex';
+          console.log(`phone candidate ACCEPTED: "${c}" (${d} digits)`);
+        } else {
+          console.log(`phone candidate rejected: "${c}" (${d} digits${phone ? ', already have one' : ', need 8-15'})`);
+        }
       }
+      if (candidates.length === 0) console.log('phone: no digit-run candidates in card text');
 
       const phoneBtn = card.querySelector('button[aria-label*="Call"]') || card.querySelector('a[href^="tel:"]');
       if (phoneBtn) {
         const href = phoneBtn.getAttribute('href') || '';
         const aria = phoneBtn.getAttribute('aria-label') || '';
-        if (href.startsWith('tel:')) phone = href.replace('tel:', '').trim();
-        else if (aria) phone = aria.replace(/^Call\s*/i, '').replace(/^Phone:\s*/i, '').trim();
+        if (href.startsWith('tel:')) {
+          phone = href.replace('tel:', '').trim();
+          phoneSource = 'tel: link';
+        } else if (aria) {
+          phone = aria.replace(/^Call\s*/i, '').replace(/^Phone:\s*/i, '').trim();
+          phoneSource = 'Call button aria-label';
+        }
+        console.log(`phone OVERRIDDEN by ${phoneSource}: "${phone}"`);
       }
 
       let address = '';
@@ -1098,12 +1144,20 @@ function scrapeVisibleListings() {
           const isSocial = SOCIAL_DOMAINS.some(d => href.includes(d));
           if (isSocial) {
             socialMedia = href;
+            console.log(`website anchor "${href}" → classified as SOCIAL`);
           } else {
             website = href;
             hasOwnWebsite = 'Yes';
+            console.log(`website anchor "${href}" → classified as OWN WEBSITE`);
           }
+        } else if (href) {
+          console.log(`website anchor "${href}" → ignored (maps/javascript link)`);
         }
       });
+      if (allAnchors.length === 0) console.log('website: no anchors in card → Unknown (enrichment will confirm)');
+
+      console.log('final:', { phone, phoneSource: phoneSource || 'none', website, hasOwnWebsite, rating, reviews, category, address });
+      console.groupEnd();
 
       results.push({
         "Business Name": name,
@@ -1214,8 +1268,15 @@ async function enrichSingleListing(index) {
     if (!phone) {
       const panel = document.querySelector('div[role="main"]') || document.querySelector('.m6QErb');
       const mainText = panel ? panel.innerText : '';
-      const m = mainText.match(/\+?\d[\d\s\-().]{6,18}\d/);
-      if (m && isValidPhone(m[0])) phone = m[0].trim();
+      const candidates = mainText.match(/\+?\d[\d\s\-().]{6,18}\d/g) || [];
+      for (const c of candidates) {
+        if (isValidPhone(c)) {
+          phone = c.trim();
+          console.log(`[LeadMachine] panel-text phone fallback ACCEPTED: "${c}"`);
+          break;
+        }
+        console.log(`[LeadMachine] panel-text phone fallback rejected: "${c}" (need 8-15 digits)`);
+      }
     }
 
     // Address Extraction
@@ -1370,16 +1431,24 @@ async function enrichSingleListing(index) {
 
   if (!isNavigated) {
     // Do NOT scrape the panel — it still shows the previous listing.
+    console.log(`[LeadMachine] enrich #${index} "${targetName}": NAV FAILED (panel title never matched, placeId=${targetId || 'none'}) — skipped`);
     return { status: 'nav-failed', name: targetName };
   }
 
   await delay(300);
 
   const record = readDetailPanel();
-  if (!record) return { status: 'nav-failed', name: targetName };
+  if (!record) {
+    console.log(`[LeadMachine] enrich #${index} "${targetName}": navigated but no detail panel title found — skipped`);
+    return { status: 'nav-failed', name: targetName };
+  }
 
   if (!record["Place ID"] && targetId) record["Place ID"] = targetId;
   if (!record["Maps URL"].includes('/place/')) record["Maps URL"] = (link.href || '').split('?')[0];
 
+  console.log(`[LeadMachine] enrich #${index} "${targetName}": OK →`, {
+    phone: record.Phone, website: record.Website, hasOwnWebsite: record["Has Own Website"],
+    social: record["Social Media"], address: record.Address
+  });
   return { status: 'ok', record };
 }
