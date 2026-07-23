@@ -1,11 +1,9 @@
 /**
- * Maps & Search Lead Generator — Master Lead Suite (v7.3 PRO for Edge & Chrome)
+ * Maps & Search Lead Generator — Master Lead Suite (v7.4 PRO for Edge & Chrome)
  *
  * Developed by JSP Coders
- * Fine-Tuned Regex Engine:
- * 1. Strict single-line Phone Regex: Prevents matching across newlines (\n).
- * 2. Optimized Indian & International Phone Number Extraction.
- * 3. Clean Regex character sets [0-9 \-.()] to eliminate unneeded escapes.
+ * Fix: Removed flawed `.includes('201')` / `.includes('202')` substring rejection.
+ * Phone numbers containing '201', '202', '203' (e.g. 09509201606) are now 100% captured!
  */
 
 let allLeads = [];
@@ -481,7 +479,6 @@ function scrapeGoogleSearchPage() {
       const text = snippetEl ? snippetEl.innerText : block.innerText;
 
       let phone = '';
-      // Strict single-line phone regex (does not cross newlines)
       const phoneMatch = text.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/);
       if (phoneMatch && phoneMatch[0].length >= 8) phone = phoneMatch[0].trim();
 
@@ -563,9 +560,15 @@ function scrapeVisibleListings() {
     if (!phone) {
       const panel = document.querySelector('div[role="main"]') || document.querySelector('.m6QErb');
       const mainText = panel ? panel.innerText : '';
-      const m = mainText.match(/(\+?\d{1,4}[-.\s]?)?(\(?\d{2,5}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}/);
-      if (m && m[0].length >= 7 && !m[0].includes('202') && !m[0].includes('201')) {
-        phone = m[0].trim();
+      const matches = mainText.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/g) || [];
+      for (const candidate of matches) {
+        const cleaned = candidate.trim();
+        const digits = cleaned.replace(/\D/g, '');
+        // Ignore 6-digit PIN codes or standalone 4-digit years (2024, 2025, etc.)
+        if (digits.length >= 8 && digits.length <= 13) {
+          phone = cleaned;
+          break;
+        }
       }
     }
 
@@ -677,7 +680,6 @@ function scrapeVisibleListings() {
       }
 
       let phone = '';
-      // Strict single-line phone match on card text
       const phoneMatch = cardText.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/);
       if (phoneMatch && phoneMatch[0].length >= 8) phone = phoneMatch[0].trim();
 
@@ -866,9 +868,15 @@ async function enrichListings() {
     if (!phone) {
       const panel = document.querySelector('div[role="main"]') || document.querySelector('.m6QErb');
       const mainText = panel ? panel.innerText : '';
-      const m = mainText.match(/(\+?\d{1,4}[-.\s]?)?(\(?\d{2,5}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}/);
-      if (m && m[0].length >= 7 && !m[0].includes('202') && !m[0].includes('201')) {
-        phone = m[0].trim();
+      const matches = mainText.match(/(\+?\d{1,3}[ -]?)?\(?\d{2,5}\)?[ -]?\d{3,5}[ -]?\d{3,5}/g) || [];
+      for (const candidate of matches) {
+        const cleaned = candidate.trim();
+        const digits = cleaned.replace(/\D/g, '');
+        // Do NOT reject numbers containing 201 or 202! Require 8 to 13 digits.
+        if (digits.length >= 8 && digits.length <= 13) {
+          phone = cleaned;
+          break;
+        }
       }
     }
 
